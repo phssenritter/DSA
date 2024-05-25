@@ -77,4 +77,60 @@ public class AVLTree<K extends Comparable<K>> implements IAVLTree<K> {
         tmp.updateHeight();
         return tmp;
     }
+
+    public AVLNode<K> rebalance(AVLNode<K> n){
+        int balance = n.getBalance();
+        if(balance > 1){
+            if(n.getLeft().getBalance() >= 0) {
+                return rotateRight(n);
+            } else {
+                n.setLeft(rotateLeft(n.getLeft()));
+                return rotateRight(n);
+            }
+        } else if (balance < -1){
+            if(n.getRight().getBalance() <= 0 ){
+                return rotateLeft(n);
+            } else {
+                n.setRight(rotateRight(n.getBalance()));
+                return rotateLeft(n);
+            }
+        }
+        return n;
+    }
+
+    private AVLNode<K> findSmallest(AVLNode<K> n) {
+        while (n.getLeft() != null) {
+            n = n.getLeft();
+        }
+        return n;
+    }
+
+    private AVLNode<K> removeRecursive(AVLNode<K> n, K k) {
+        int cmp = n.getKey().compareTo(k);
+        if (cmp == 0) {
+            if (n.getLeft() == null && n.getRight() == null) {
+                    return null;
+            } else if (n.getLeft() == null) {
+                return n.getRight();
+            } else if (n.getRight() == null) {
+                return n.getLeft();
+            } else {
+                AVLNode<K> smallest = findSmallest(n.getRight());
+                n.setKey(smallest.getKey());
+                n.setRight(removeRecursive(n.getRight(), smallest.getKey()));
+            }
+        } else if (cmp < 0) {
+            n.setRight(removeRecursive(n.getRight(), k));
+        } else {
+            n.setLeft(removeRecursive(n.getLeft(), k));
+        }
+        n.updateHeight();
+        return rebalance(n);
+    }
+
+    public void remove(K k){
+        if (root != null) {
+            root.removeRecursive(root,k)
+        }
+    }
 }

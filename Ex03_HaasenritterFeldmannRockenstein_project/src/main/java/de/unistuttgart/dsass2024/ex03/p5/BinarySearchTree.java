@@ -37,5 +37,16 @@ public class BinarySearchTree<T extends Comparable<T>> implements IBinarySearchT
         return this.root;
     }
 
+    public boolean Full(){
+        return Full(this.root);
+    }
+
+    private boolean Full(IBinaryTreeNode<T> node){
+        if(node == null){
+            return true;
+        }
+        if()
+    }
+
 
 }
