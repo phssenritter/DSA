@@ -8,6 +8,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="Ex01_LastNamesOfMembers_project" />
         <module name="Ex00_RockensteinFeldmannHaasenritter" />
+        <module name="Ex08_LastNamesOfMembers_project" />
       </profile>
     </annotationProcessing>
   </component>
