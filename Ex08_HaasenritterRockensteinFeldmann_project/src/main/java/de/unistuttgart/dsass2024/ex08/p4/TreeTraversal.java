@@ -18,28 +18,29 @@ public class TreeTraversal {
      * returned array contains the value -1 (i.e., pi[x] = -1).
      */
     public static int[] dfs(ArrayList<ArrayList<Integer>> weights, int s) throws IllegalArgumentException {
-        int n = weights.size(); // Anzahl der Knoten
+        //number of nodes
+        int n = weights.size();
         int[] pi = new int[n];
         boolean[] visited = new boolean[n];
 
-        // Initialisiere das pi-Array mit -1 (kein Vorgänger)
+        // initialize the pi-Array with -1
         for (int i = 0; i < n; i++) {
             pi[i] = -1;
         }
 
-        // Validiere die Adjazenzmatrix (weights), dass sie rechteckig ist
+        // this method validates that the given adjacency matrix is rectangular
         for (ArrayList<Integer> row : weights) {
             if (row.size() != n) {
                 throw new IllegalArgumentException("Adjazenzmatrix ist nicht rechteckig");
             }
         }
 
-        // Validiere den Startknoten s, dass er innerhalb des gültigen Bereichs liegt
+        // validates that the start node s is within the valid range
         if (s < 0 || s >= n) {
             throw new IllegalArgumentException("Startknoten liegt außerhalb des gültigen Bereichs");
         }
 
-        // Führe die DFS durch
+        // starts the dfs
         dfsRekursiv(weights, s, pi, visited);
 
         return pi;
@@ -48,10 +49,10 @@ public class TreeTraversal {
     private static void dfsRekursiv(ArrayList<ArrayList<Integer>> weights, int u, int[] pi, boolean[] visited) {
         visited[u] = true;
 
-        // Durchlaufe Nachbarn von u mit der kleinsten ID
+        // iterates through neighbors of u with the smallest ID
         for (int v = 0; v < weights.size(); v++) {
-            if (weights.get(u).get(v) > 0 && !visited[v]) { // Es gibt eine Kante von u nach v und v ist nicht besucht
-                pi[v] = u; // v wird von u erreicht
+            if (weights.get(u).get(v) > 0 && !visited[v]) { // checks if there is an edge from u to v and v is not visited
+                pi[v] = u; // u gets to v
                 dfsRekursiv(weights, v, pi, visited);
             }
         }

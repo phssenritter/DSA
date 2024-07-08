@@ -32,7 +32,76 @@ public class ClosedHashMap<V> extends AbstractHashMap<V> {
      */
     @SuppressWarnings("unchecked")
     public ClosedHashMap(int size) throws IllegalArgumentException {
+        if (!isPrime(size) || size % 4 != 3) {
+            throw new IllegalArgumentException("Size must be a prime number congruent to 3 mod 4.");
+        }
+        map = (KeyValuePair<V>[]) new KeyValuePair[size];
+    }
 
+    @Override
+    public V put(int key, V value) throws IllegalStateException {
+        int i = 0;
+        int h = key % map.length;
+
+        while (i < map.length) {
+            int j = (h + (int)Math.pow(-1, i-1) * i * i) % map.length;
+            if (j < 0) {
+                j += map.length;
+            }
+            if (map[j] == null) {
+                map[j] = new KeyValuePair<>(key, value);
+                return null;
+            }
+            if (map[j].getKey() == key) {
+                V oldValue = map[j].getValue();
+                map[j] = new KeyValuePair<>(key, value);
+                return oldValue;
+            }
+            i++;
+        }
+        throw new IllegalStateException("HashMap overflow");
+    }
+
+    @Override
+    public boolean containsKey(int key) {
+        int i = 0;
+        int h = key % map.length;
+
+        while (i < map.length) {
+            int j = (h + (int)Math.pow(-1, i-1) * i * i) % map.length;
+            if (j < 0) {
+                j += map.length;
+            }
+            if (map[j] == null) {
+                return false;
+            }
+            if (map[j].getKey() == key) {
+                return true;
+            }
+            i++;
+        }
+        return false;
+    }
+
+    @Override
+    public V get(int key) {
+        int i = 0;
+        int h = key % map.length;
+
+        while (i < map.length) {
+            int j = (h + (int)Math.pow(-1, i-1) * i * i) % map.length;
+            if (j < 0) {
+                j += map.length;
+            }
+            if (map[j] == null) {
+                return null;
+            }
+            if (map[j].getKey() == key) {
+                return map[j].getValue();
+            }
+            i++;
+        }
+        return null;
     }
 
     public Iterator<KeyValuePair<V>> iterator() {
@@ -67,6 +136,16 @@ public class ClosedHashMap<V> extends AbstractHashMap<V> {
                 return result;
             }
         };
+    }
+
+    private boolean isPrime(int n) {
+        if (n <= 1) return false;
+        if (n <= 3) return true;
+        if (n % 2 == 0 || n % 3 == 0) return false;
+        for (int i = 5; i * i <= n; i += 6) {
+            if (n % i == 0 || n % (i + 2) == 0) return false;
+        }
+        return true;
     }
 
 }

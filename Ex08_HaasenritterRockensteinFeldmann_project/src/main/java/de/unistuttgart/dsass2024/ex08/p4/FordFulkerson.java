@@ -16,7 +16,7 @@ public class FordFulkerson implements IFordFulkerson{
         numVertices = graph.size();
         residualGraph = new ArrayList<>();
 
-        // Initialize residual graph
+        // initialize residual graph
         for (ArrayList<Integer> row : graph) {
             residualGraph.add(new ArrayList<>(row));
         }
@@ -28,7 +28,7 @@ public class FordFulkerson implements IFordFulkerson{
 
         int maxFlow = 0;
 
-        // Augment the flow while there is an augmenting path from s to t
+        // argument the flow while there is an augmenting path from s to t
         while (hasAugmentingPath(s, t)) {
             // Find the maximum flow through the path found
             int pathFlow = Integer.MAX_VALUE;
@@ -37,17 +37,17 @@ public class FordFulkerson implements IFordFulkerson{
                 pathFlow = Math.min(pathFlow, residualGraph.get(u).get(v));
             }
 
-            // Update residual capacities of the edges and reverse edges along the path
+            // update residual capacities of the edges and reverse edges along the path
             for (int v = t; v != s; v = parent[v]) {
                 int u = parent[v];
                 residualGraph.get(u).set(v, residualGraph.get(u).get(v) - pathFlow);
                 residualGraph.get(v).set(u, residualGraph.get(v).get(u) + pathFlow);
 
-                // Update the flow graph (forward edges only)
+                // update the flow graph (forward edges only)
                 maxFlowGraph.get(u).set(v, maxFlowGraph.get(u).get(v) + pathFlow);
             }
 
-            // Add path flow to overall flow
+            // add path flow to overall flow
             maxFlow += pathFlow;
         }
 
@@ -82,7 +82,7 @@ public class FordFulkerson implements IFordFulkerson{
             }
         }
 
-        // Return true if we reached the sink t in BFS starting from source s
+        // returns true if we reached the sink t in BFS starting from source s
         return visited[t];
     }
 

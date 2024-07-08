@@ -186,6 +186,22 @@ public class NFA {
      */
     public static NFA concat(NFA nfa1, NFA nfa2) {
 
+        Set<Character> alphabet = new HashSet<>(nfa1.getAlphabet());
+        alphabet.addAll(nfa2.getAlphabet());
+
+
+        ArrayList<HashMap<Character, Set<Integer>>> transitions = new ArrayList<>();
+        addTransitions(transitions, nfa1.getTransitions());
+        int offset = transitions.size();
+        addTransitions(transitions, nfa2.getTransitions());
+
+
+        addTransition(transitions, nfa1.getFinalState(), '\0', offset);
+
+
+        int finalState = offset + nfa2.getFinalState();
+
+        return new NFA(alphabet, transitions, finalState);
     }
 
     /**
@@ -203,6 +219,29 @@ public class NFA {
      */
     public static NFA union(NFA nfa1, NFA nfa2) {
 
+        Set<Character> alphabet = new HashSet<>(nfa1.getAlphabet());
+        alphabet.addAll(nfa2.getAlphabet());
+
+
+        ArrayList<HashMap<Character, Set<Integer>>> transitions = new ArrayList<>();
+        addTransitions(transitions, nfa1.getTransitions());
+        int offset1 = transitions.size();
+        addTransitions(transitions, nfa2.getTransitions());
+        int offset2 = offset1 + nfa2.getTransitions().size();
+
+
+        int initialState = addState(transitions);
+        int finalState = addState(transitions);
+
+
+        addTransition(transitions, initialState, '\0', 0);
+        addTransition(transitions, initialState, '\0', offset1);
+
+
+        addTransition(transitions, nfa1.getFinalState(), '\0', finalState);
+        addTransition(transitions, offset1 + nfa2.getFinalState(), '\0', finalState);
+
+        return new NFA(alphabet, transitions, finalState);
     }
 
     /**
@@ -219,6 +258,26 @@ public class NFA {
      */
     public static NFA repetition(NFA nfa) {
 
+        Set<Character> alphabet = new HashSet<>(nfa.getAlphabet());
+
+
+        ArrayList<HashMap<Character, Set<Integer>>> transitions = new ArrayList<>();
+        addTransitions(transitions, nfa.getTransitions());
+
+
+        int initialState = addState(transitions);
+        int finalState = addState(transitions);
+
+
+        addTransition(transitions, initialState, '\0', 0);
+
+        addTransition(transitions, initialState, '\0', finalState);
+
+        addTransition(transitions, nfa.getFinalState(), '\0', 0);
+
+        addTransition(transitions, nfa.getFinalState(), '\0', finalState);
+
+        return new NFA(alphabet, transitions, finalState);
     }
 
     public static void main(String[] args) {

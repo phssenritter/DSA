@@ -1,6 +1,14 @@
 package de.unistuttgart.dsass2024.ex08.p2;
 
 import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.PriorityQueue;
+import java.util.Set;
 
 public class MinimalSpanningTree {
     /**
@@ -11,67 +19,58 @@ public class MinimalSpanningTree {
      * @return a set of edges, which belong to the MST of the given graph
      */
     public static Set<IEdge> kruskal(IWeightedGraph graph) {
-        Set<IEdge> mst = new HashSet<>();
-        List<IEdge> edges = new ArrayList<>();
-        graph.edgeIterator().forEachRemaining(edges::add);
+        // sort Edges ascending
+        ArrayList<IEdge> edgeList = new ArrayList<>();
+        Iterator<IEdge> EdgeIterator = graph.edgeIterator();
+        // get Edges from Adjacency list and add them to a List in an unsorted manner
+        while(EdgeIterator.hasNext())
+        {
+            edgeList.add(EdgeIterator.next());
+        }
+        EdgeWeigthComparator comparator = new EdgeWeigthComparator();
 
-        // Sort edges by weight
-        Collections.sort(edges, Comparator.comparingDouble(IEdge::getWeight));
+        // sort EdgeList in ascending order by Weights
+        Collections.sort(edgeList,comparator);
+        // debug
+    	/*
+    	 System.out.println("After sorting:");
+         for (IEdge edge : edgeList) {
+             System.out.println(edge.getWeight());
+         }
+         */
+        int numNodes = graph.numberOfNodes();
+        long[] NodeIDs;
+        NodeIDs = new long[numNodes];
 
-        // Initialize Union-Find structure
-        UnionFind uf = new UnionFind(graph.numberOfNodes());
+        Iterator<Node> nodeIterator = graph.nodeIterator();
+        //set of edges, which belong to the MST of the given graph
+        Set<IEdge> result = new HashSet<>();
+        //for all v element of V do Make-set(v)
 
-        for (IEdge edge : edges) {
-            long src = edge.getSource();
-            long dest = edge.getDestination();
-
-            // If src and dest are not connected, add the edge to the MST
-            if (uf.find(src) != uf.find(dest)) {
-                uf.union(src, dest);
-                mst.add(edge);
-            }
+        int i = 0;
+        while(nodeIterator.hasNext()) {
+            NodeIDs[i] = nodeIterator.next().getID();
+            i++;
         }
 
-        return mst;
+        int size = graph.numberOfNodes();
+        UnionFind uf = new UnionFind(size,NodeIDs);
+
+        for(IEdge e : edgeList) {
+
+            //skip this edge to avoid creating a cycle in MST
+            if(uf.connected(e.getSource(),e.getDestination())) continue;
+            // Include this edge
+            uf.union(e.getSource(), e.getDestination());
+            //add Node to minimal spanning tree
+            result.add(e);
+
+        }
+
+        return result;
+
     }
 
-    static class UnionFind {
-        private final Map<Long, Long> parent;
-        private final Map<Long, Integer> rank;
-
-        public UnionFind(int size) {
-            parent = new HashMap<>(size);
-            rank = new HashMap<>(size);
-        }
-
-        public long find(long node) {
-            if (parent.get(node) == null) {
-                parent.put(node, node);
-                rank.put(node, 0);
-            }
-            if (parent.get(node) != node) {
-                parent.put(node, find(parent.get(node))); // Path compression
-            }
-            return parent.get(node);
-        }
-
-        public void union(long node1, long node2) {
-            long root1 = find(node1);
-            long root2 = find(node2);
-
-            if (root1 != root2) {
-                // Union by rank
-                if (rank.get(root1) > rank.get(root2)) {
-                    parent.put(root2, root1);
-                } else if (rank.get(root1) < rank.get(root2)) {
-                    parent.put(root1, root2);
-                } else {
-                    parent.put(root2, root1);
-                    rank.put(root1, rank.get(root1) + 1);
-                }
-            }
-        }
-    }
 }
 
 
